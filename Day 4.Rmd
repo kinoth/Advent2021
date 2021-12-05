@@ -1,0 +1,101 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+rm(list=ls())
+library(dplyr)
+library(readr)
+```
+
+```{r}
+numbers <- read.csv(file="day4input", nrows=1, header=F) %>% as.numeric() #bingo numbers
+grids <- read.fwf('day4input', skip=2, widths=rep(3,5)) %>% rbind(rep(NA,5)) #bingo sheets as df
+```
+
+```{r}
+#make bingo sheet df into list of matrices
+sheets <- list()
+
+for (ii in 1:(NROW(grids)%/%6)){
+  sheets[[ii]] <- as.matrix(grids[seq(6*ii-5,6*ii-1),1:5])
+}
+```
+
+```{r}
+bingo <- sheets
+winrar.found <- F
+ii <- 1
+
+#ii : Position in number draw; jj : Position in bingo card pile; kk : row/column of bingo card
+
+#loop until winner is found
+while (!winrar.found){
+  for (jj in 1:NROW(sheets)){ #loop over bingo cards
+    sheet.j <- bingo[[jj]]
+    sheet.j <- replace(sheet.j, sheet.j==numbers[ii], NA) #mark off current number
+
+    for (kk in 1:NROW(sheet.j)){ #Check if card is a winner
+      if (sheet.j[kk,] %>% is.na() %>% sum() == 5 | sheet.j[,kk] %>% is.na() %>% sum() == 5){ #if winner
+        winrar.found <- T
+        winner <- jj
+        winner.card <- sheet.j
+        lastnum <- numbers[ii]
+        cat(sep="","CARD #", jj, ": A WINRAR IS YOU")
+      }
+    }
+
+    bingo[[jj]] <- sheet.j #Mark bingo card in list
+
+  }
+  ii <- ii+1
+}
+```
+
+
+```{r}
+(Part1Ans <- sum(winner.card, na.rm=T)*lastnum) #67716
+```
+```{r}
+bingo <- sheets
+winrar.found <- F
+ii <- 1
+winners <- rep(F,length(bingo))
+switch <- T
+
+#ii : Position in number draw; jj : Bingo Card Number kk : row/column of bingo card
+
+while (switch){
+  #loop over bingo cards
+  for (jj in 1:NROW(sheets)){ 
+    sheet.j <- bingo[[jj]]
+    sheet.j <- replace(sheet.j, sheet.j==numbers[ii], NA) #mark off current number
+    #Check if card is a winner
+    for (kk in 1:NROW(sheet.j)){ 
+      #if winner
+      if ((sheet.j[kk,] %>% is.na() %>% sum() == 5 | sheet.j[,kk] %>% is.na() %>% sum() == 5) & !winners[jj]){
+        winners[jj] <- T
+      }
+    }
+    bingo[[jj]] <- sheet.j #Mark bingo card in list
+  }
+  if (sum(!winners)==1){
+    loser <- which(!winners)
+    cat(sep="","CARD #", which(!winners), ": A LOSER IS YOU")
+  }
+  if (sum(!winners)==0){
+    switch <- F
+    lastnum <- numbers[ii]
+    loser.card <- bingo[[loser]]
+    
+  }else{
+    ii <- ii+1
+  }
+}
+```
+```{r}
+(Part2Ans <- sum(loser.card, na.rm=T)*lastnum) #1830
+```
+
+

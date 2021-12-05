@@ -1,0 +1,25 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+rm(list=ls())
+input <- read.table('day1input')$V1
+
+input1 <- input[-1]
+input2 <- input[-2000]
+
+(Part1Ans <- sum(input1 - input2 > 0))
+```
+
+```{r}
+library(zoo)
+windows <- rollapply(input,3,sum)
+
+windows1 <- windows[-1]
+windows2 <- windows[-NROW(windows)]
+
+(Part2Ans <- sum(windows1 - windows2 > 0))
+```
+

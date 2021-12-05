@@ -1,0 +1,48 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+rm(list=ls())
+library(plyr)
+library(dplyr)
+
+input <- read.table('day2input', col.names = c("direction","units"))
+
+move <- as.complex(mapvalues(x=input$direction, from=c("forward", "down", "up"), to=c(1+0i,0-1i,0+1i)))*input$units # convert magnitutde and direction to unit complex number
+
+```
+
+```{r}
+sum(move)
+(Part1Ans <- abs(Re(sum(move))*Im(sum(move))))
+```
+
+```{r}
+aim <- cumsum(Im(move)) #cumulative sum of vertical adjustments
+
+pos <- cumsum(0+0i+Re(move))+cumsum(0+1i*Re(move)*aim)
+last(pos)
+(Part2Ans <- last(abs(Re(pos)*Im(pos))))
+```
+
+#Defunct - removed need for loop
+```{r, eval=FALSE}
+aim <- 0+0i
+pos <- 8+0i
+
+
+for (i in 2:NROW(move)){
+  if (Im(move[i])==0){
+    pos <- pos+move[i]+aim*abs(move[i])
+  }else{
+    aim <- aim + move[i]
+  }
+}
+abs(Re(pos)*Im(pos))
+```
+
+
+
+
