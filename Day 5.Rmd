@@ -16,14 +16,14 @@ rowcombs <- combn(NROW(lines), 2) # every distinct combination of 2 rows
 
 ```{r}
 colinear <- function(z1, z2, z3){
-  lambda <- (z1-z3)/(z3-z2)
+  lambda <- (z1-z3)/(z3-z2) #3 complex points are colinear iff lambda is a real number
   return(Im(lambda)==0) 
 }
 
 splitc <- function(Z){
-  return(c(Re(Z),Im(Z)))
+  return(c(Re(Z),Im(Z))) #splits complex coordinate into (x,y) vector
 }
-overlap <- function(x,y){ #need to add diagonals
+overlap <- function(x,y){ #check if colinear line segments overlap, return vector of points of overlap if they do. need to add diagonals
   
   if (var(x)==0 & any(y[1:2] %in% y[3]:y[4], y[3:4] %in% y[1]:y[2])){ #if  vertical and overlaps
     seg <- sort(y)
@@ -38,7 +38,7 @@ overlap <- function(x,y){ #need to add diagonals
   }
 }
 
-lineintercept <- function (Z1,Z2,Z3,Z4, segment = T){
+lineintercept <- function (Z1,Z2,Z3,Z4, segment = T){ #line-line intercept using Bezier parameter method
   P1 <- splitc(Z1) #get point pairs from cmplx coordinates
   P2 <- splitc(Z2)
   P3 <- splitc(Z3)
@@ -72,7 +72,7 @@ lineintercept <- function (Z1,Z2,Z3,Z4, segment = T){
 ```
 
 ```{r}
-points <- data.frame(C=complex(), L1=numeric(), L2=numeric(), straight=logical())
+points <- data.frame(C=complex(), L1=numeric(), L2=numeric(), straight=logical()) #initialise
 for (i in 1:NCOL(rowcombs)){
   L1i <- rowcombs[1,i]
   L2i <- rowcombs[2,i]
@@ -99,7 +99,7 @@ points <- mutate(points, C = round(C,digits=2)) #fixes weird floating point issu
 ```
 
 ```{r}
-spoints <- points[points$straight,]
+spoints <- points[points$straight,] #straight line points
 t1 <- spoints %>% select(C) %>% count(C)
 (Part1Ans <- NROW(t1))
 ```
